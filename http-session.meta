@@ -1,0 +1,10 @@
+;;; http-session.meta -*- scheme -*-
+
+((egg "http-session.egg")
+ (synopsis "Facilities for managing HTTP sessions")
+ (author "Mario Domenech Goulart")
+ (doc-from-wiki)
+ (license "BSD")
+ (category web)
+ (needs sha1 spiffy intarweb uri-common)
+ (files "http-session.scm" "http-session.setup" "http-session.html"))
