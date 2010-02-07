@@ -2,7 +2,7 @@
 
 ((egg "http-session.egg")
  (synopsis "Facilities for managing HTTP sessions")
- (author "Mario Domenech Goulart")
+ (author "<a href=\"http://chicken.wiki.br/users/mario-domenech-goulart\">Mario Domenech Goulart</a>")
  (doc-from-wiki)
  (license "BSD")
  (category web)
