@@ -6,5 +6,4 @@
  (doc-from-wiki)
  (license "BSD")
  (category web)
- (needs sha1 spiffy intarweb uri-common)
- (files "http-session.scm" "http-session.setup" "http-session.html"))
+ (needs sha1 spiffy intarweb uri-common))
