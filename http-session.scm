@@ -71,7 +71,8 @@
      (lambda ()
        (sha1-digest (conc (current-milliseconds)
                           (current-process-id)
-                          (random (+ 1000 (current-milliseconds))))))))
+                          (random (+ 1000 (inexact->exact
+                                           (current-milliseconds)))))))))
 
   (define (unique-id)
     (let try-again ((id ((session-id-generator))))
