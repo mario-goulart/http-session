@@ -5,7 +5,7 @@
          session-lifetime session-id-generator
          make-session-table match-ip-address? session-destroy! session-del!)
 
-  (import scheme chicken data-structures utils extras regex)
+  (import scheme chicken data-structures utils extras)
 
   (use sha1 posix intarweb spiffy uri-common srfi-1 srfi-18 srfi-69)
 
