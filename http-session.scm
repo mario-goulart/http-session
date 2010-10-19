@@ -69,10 +69,10 @@
   (define session-id-generator
     (make-parameter
      (lambda ()
-       (sha1-digest (conc (current-milliseconds)
-                          (current-process-id)
-                          (random (+ 1000 (inexact->exact
-                                           (current-milliseconds)))))))))
+       (sha1-digest
+        (conc (current-milliseconds)
+              (current-process-id)
+              (random (+ 1000 (current-process-id))))))))
 
   (define (unique-id)
     (let try-again ((id ((session-id-generator))))
