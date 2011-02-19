@@ -7,7 +7,7 @@
 
   (import scheme chicken data-structures utils extras)
 
-  (use sha1 posix intarweb spiffy uri-common srfi-1 srfi-18 srfi-69)
+  (use simple-sha1 posix intarweb spiffy uri-common srfi-1 srfi-18 srfi-69)
 
   (define (make-session-table) (make-hash-table equal?))
   ;; key=sid value=#<session-item expiration from-ip bindings>
@@ -69,7 +69,7 @@
   (define session-id-generator
     (make-parameter
      (lambda ()
-       (sha1-digest
+       (string->sha1sum
         (conc (current-milliseconds)
               (current-process-id)
               (random (+ 1000 (current-process-id))))))))
