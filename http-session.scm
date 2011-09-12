@@ -28,7 +28,12 @@
     (handle-exceptions
      exn
      (if error?
-         (error (conc "Invalid session ID: " sid))
+         (raise (make-composite-condition
+                 (make-property-condition
+                  'exn
+                  'message (conc "Invalid session ID: " sid))
+                 (make-property-condition
+                  'invalid-session)))
          #f)
      (hash-table-ref (session-table) sid)))
     
