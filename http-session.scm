@@ -36,7 +36,7 @@
                   'invalid-session)))
          #f)
      (hash-table-ref (session-table) sid)))
-    
+
   (define (session-create #!optional (bindings '()))
     (let ((sid (unique-id))
           (expiration (expiration)))
@@ -67,7 +67,7 @@
     (let ((finalizer (session-item-finalizer (get-session-item sid))))
       (when finalizer (finalizer sid)))
     (hash-table-delete! (session-table) sid))
-  
+
   (define session-delete!  ;; DEPRECATED
     session-destroy!)
 
@@ -88,10 +88,10 @@
   (define (session-ref sid var #!optional default)
     (or (alist-ref var (session-item-bindings (get-session-item sid)))
         default))
-  
+
   (define (session-set! sid var val)
     (let* ((sitem (get-session-item sid))
-	   (new-bindings (alist-update! var val (session-item-bindings sitem))))
+           (new-bindings (alist-update! var val (session-item-bindings sitem))))
       (session-item-bindings-set! sitem new-bindings)))
 
   (define (session-set-finalizer! sid proc)
@@ -99,11 +99,11 @@
 
   (define (session-bindings sid)
     (session-item-bindings (get-session-item sid)))
-  
+
   (define (session-del! sid var)
     (alist-delete! var (session-bindings sid)))
 
   (define session-delete-binding! ;; DEPRECATED
     session-del!)
-  
+
   )
