@@ -1,7 +1,7 @@
 ;;; http-session.setup -*- scheme -*-
 
-(compile -s -O2 -d1 -j http-session http-session.scm)
-(compile -s -O2 -d1 http-session.import.scm)
+(compile -s -O3 -d1 -j http-session http-session.scm)
+(compile -s -O3 -d1 http-session.import.scm)
 
 (install-extension 'http-session
                    '("http-session.so" "http-session.import.so")
