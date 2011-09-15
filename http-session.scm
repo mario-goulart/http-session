@@ -1,14 +1,17 @@
 (module http-session
-        (session-table session-create session-refresh! session-valid?
+        (session-create session-refresh! session-valid?
          session-ref session-set! session-set-finalizer! session-bindings
-         session-lifetime session-id-generator make-session-table
+         session-lifetime session-id-generator
          match-ip-address? session-destroy! session-del!
+
+         session-table make-session-table ;; DEPRECATED
 
          ;; session-item record
          make-session-item session-item-expiration session-item-ip
          session-item-bindings session-item-finalizer
-         
+
          ;; Configurable storage backend API
+         session-storage make-session-storage
          session-storage-initialize session-storage-set! session-storage-ref
          session-storage-delete! session-storage-cleanup!
          )
@@ -27,17 +30,17 @@
 (define session-storage-set!
   (make-parameter
    (lambda (sid session-item)
-     (hash-table-set! (session-table) sid session-item))))
+     (hash-table-set! (session-storage) sid session-item))))
 
 (define session-storage-ref
   (make-parameter
    (lambda (sid)
-     (hash-table-ref (session-table) sid))))
+     (hash-table-ref (session-storage) sid))))
 
 (define session-storage-delete!
   (make-parameter
    (lambda (sid)
-     (hash-table-delete! (session-table) sid))))
+     (hash-table-delete! (session-storage) sid))))
 
 (define session-storage-cleanup!
   (make-parameter
@@ -61,12 +64,16 @@
     ((session-storage-ref) sid)))
 
 
-(define (make-session-table)
+(define (make-session-storage)
   ;; The default value is a in-memory hash-table whose format is
   ;; key=sid value=#<session-item expiration from-ip bindings>
   ((session-storage-initialize)))
 
-(define session-table (make-parameter (make-session-table)))
+(define make-session-table make-session-storage) ;; DEPRECATED
+
+(define session-storage (make-parameter (make-session-storage)))
+
+(define session-table session-storage) ;; DEPRECATED
 
 (define match-ip-address? (make-parameter #f))
 
