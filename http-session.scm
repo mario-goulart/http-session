@@ -1,9 +1,8 @@
 (module http-session
         (session-table session-create session-refresh! session-valid?
-         session-delete! session-ref session-set! session-set-finalizer!
-         session-bindings session-delete-binding!
-         session-lifetime session-id-generator
-         make-session-table match-ip-address? session-destroy! session-del!
+         session-ref session-set! session-set-finalizer! session-bindings
+         session-lifetime session-id-generator make-session-table
+         match-ip-address? session-destroy! session-del!
 
          ;; Configurable storage backend API
          session-storage-initialize session-storage-set! session-storage-ref
@@ -104,9 +103,6 @@
     (when finalizer (finalizer sid)))
   ((session-storage-delete!) (session-table) sid))
 
-(define session-delete!  ;; DEPRECATED
-  session-destroy!)
-
 (define session-id-generator
   (make-parameter
    (lambda ()
@@ -138,9 +134,6 @@
 
 (define (session-del! sid var)
   (alist-delete! var (session-bindings sid)))
-
-(define session-delete-binding! ;; DEPRECATED
-  session-del!)
 
 (define (session-cleanup!)
   ((session-storage-cleanup!)))
