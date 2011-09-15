@@ -23,6 +23,7 @@
 
 ;; Configurable storage backend API
 (define session-storage-initialize
+  ;; A procedure that returns the session storage
   (make-parameter
    (lambda ()
      (make-hash-table equal?))))
@@ -51,8 +52,7 @@
 (define-record session-item expiration ip bindings finalizer)
 
 (define (get-session-item sid #!optional (error? #t))
-  (handle-exceptions
-      exn
+  (handle-exceptions exn
     (if error?
         (raise (make-composite-condition
                 (make-property-condition
@@ -69,9 +69,14 @@
   ;; key=sid value=#<session-item expiration from-ip bindings>
   ((session-storage-initialize)))
 
-(define make-session-table make-session-storage) ;; DEPRECATED
+(define session-storage
+  (let ((storage #f))
+    (lambda ()
+      (unless storage
+        (set! storage ((session-storage-initialize))))
+      storage)))
 
-(define session-storage (make-parameter (make-session-storage)))
+(define make-session-table make-session-storage) ;; DEPRECATED
 
 (define session-table session-storage) ;; DEPRECATED
 
@@ -100,7 +105,9 @@
     sid))
 
 (define (session-refresh! sid)
-  (session-item-expiration-set! (get-session-item sid) (expiration)))
+  (let ((sitem (get-session-item sid)))
+    (session-item-expiration-set! sitem (expiration))
+    ((session-storage-set!) sid sitem)))
 
 (define (session-valid? sid)
   (not (not (and sid
@@ -135,7 +142,8 @@
 (define (session-set! sid var val)
   (let* ((sitem (get-session-item sid))
          (new-bindings (alist-update! var val (session-item-bindings sitem))))
-    (session-item-bindings-set! sitem new-bindings)))
+    (session-item-bindings-set! sitem new-bindings)
+    ((session-storage-set!) sid sitem)))
 
 (define (session-set-finalizer! sid proc)
   (session-item-finalizer-set! (get-session-item sid) proc))
