@@ -3,25 +3,46 @@
          session-delete! session-ref session-set! session-set-finalizer!
          session-bindings session-delete-binding!
          session-lifetime session-id-generator
-         make-session-table match-ip-address? session-destroy! session-del!)
+         make-session-table match-ip-address? session-destroy! session-del!
+
+         ;; Configurable storage backend API
+         session-storage-initialize session-storage-set! session-storage-ref
+         session-storage-delete! session-storage-cleanup!
+         )
 
   (import scheme chicken data-structures utils extras)
 
   (use simple-sha1 posix intarweb spiffy uri-common srfi-1 srfi-18 srfi-69)
 
-  (define (make-session-table) (make-hash-table equal?))
-  ;; key=sid value=#<session-item expiration from-ip bindings>
 
-  (define session-table (make-parameter (make-session-table)))
+  ;; Configurable storage backend API
+  (define session-storage-initialize
+    (make-parameter
+     (lambda ()
+       (make-hash-table equal?))))
 
-  (define match-ip-address? (make-parameter #f))
+  (define session-storage-set!
+    (make-parameter
+     (lambda (session-table sid session-item)
+       (hash-table-set! session-table sid session-item))))
 
-  (define session-lifetime (make-parameter 3600)) ; 1h
+  (define session-storage-ref
+    (make-parameter
+     (lambda (session-table sid)
+       (hash-table-ref session-table sid))))
 
-  (define (expiration)
-    (+ (current-milliseconds)
-       (inexact->exact (floor (* (session-lifetime) 1000)))))
+  (define session-storage-delete!
+    (make-parameter
+     (lambda (session-table sid)
+       (hash-table-delete! session-table sid))))
 
+  (define session-storage-cleanup!
+    (make-parameter
+     (lambda ()
+       (void))))
+  
+  ;; Session items
+  
   (define-record session-item expiration ip bindings finalizer)
 
   (define (get-session-item sid #!optional (error? #t))
@@ -35,12 +56,28 @@
                  (make-property-condition
                   'invalid-session)))
          #f)
-     (hash-table-ref (session-table) sid)))
+     ((session-storage-ref) (session-table) sid)))
+
+  
+  (define (make-session-table)
+    ;; The default value is a in-memory hash-table whose format is
+    ;; key=sid value=#<session-item expiration from-ip bindings>
+    ((session-storage-initialize)))
+
+  (define session-table (make-parameter (make-session-table)))
+
+  (define match-ip-address? (make-parameter #f))
+
+  (define session-lifetime (make-parameter 3600)) ; 1h
+
+  (define (expiration)
+    (+ (current-milliseconds)
+       (inexact->exact (floor (* (session-lifetime) 1000)))))
 
   (define (session-create #!optional (bindings '()))
     (let ((sid (unique-id))
           (expiration (expiration)))
-      (hash-table-set! (session-table) sid (make-session-item expiration (remote-address) bindings #f))
+      ((session-storage-set!) (session-table) sid (make-session-item expiration (remote-address) bindings #f))
       (thread-start!
        (make-thread
         (lambda ()
@@ -50,7 +87,7 @@
               (when (> timeout 0)
                     (thread-sleep! (/ timeout 1000))
                     (loop))))
-          (hash-table-delete! (session-table) sid))))
+          ((session-storage-delete!) (session-table) sid))))
       sid))
 
   (define (session-refresh! sid)
@@ -66,7 +103,7 @@
   (define (session-destroy! sid)
     (let ((finalizer (session-item-finalizer (get-session-item sid))))
       (when finalizer (finalizer sid)))
-    (hash-table-delete! (session-table) sid))
+    ((session-storage-delete!) (session-table) sid))
 
   (define session-delete!  ;; DEPRECATED
     session-destroy!)
@@ -106,4 +143,7 @@
   (define session-delete-binding! ;; DEPRECATED
     session-del!)
 
+  (define (session-cleanup!)
+    ((session-storage-cleanup!)))
+  
   )
