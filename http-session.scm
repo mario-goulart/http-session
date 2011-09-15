@@ -4,6 +4,10 @@
          session-lifetime session-id-generator make-session-table
          match-ip-address? session-destroy! session-del!
 
+         ;; session-item record
+         make-session-item session-item-expiration session-item-ip
+         session-item-bindings session-item-finalizer
+         
          ;; Configurable storage backend API
          session-storage-initialize session-storage-set! session-storage-ref
          session-storage-delete! session-storage-cleanup!
@@ -22,18 +26,18 @@
 
 (define session-storage-set!
   (make-parameter
-   (lambda (session-table sid session-item)
-     (hash-table-set! session-table sid session-item))))
+   (lambda (sid session-item)
+     (hash-table-set! (session-table) sid session-item))))
 
 (define session-storage-ref
   (make-parameter
-   (lambda (session-table sid)
-     (hash-table-ref session-table sid))))
+   (lambda (sid)
+     (hash-table-ref (session-table) sid))))
 
 (define session-storage-delete!
   (make-parameter
-   (lambda (session-table sid)
-     (hash-table-delete! session-table sid))))
+   (lambda (sid)
+     (hash-table-delete! (session-table) sid))))
 
 (define session-storage-cleanup!
   (make-parameter
@@ -54,7 +58,7 @@
                 (make-property-condition
                  'invalid-session)))
         #f)
-    ((session-storage-ref) (session-table) sid)))
+    ((session-storage-ref) sid)))
 
 
 (define (make-session-table)
@@ -75,7 +79,7 @@
 (define (session-create #!optional (bindings '()))
   (let ((sid (unique-id))
         (expiration (expiration)))
-    ((session-storage-set!) (session-table) sid (make-session-item expiration (remote-address) bindings #f))
+    ((session-storage-set!) sid (make-session-item expiration (remote-address) bindings #f))
     (thread-start!
      (make-thread
       (lambda ()
@@ -85,7 +89,7 @@
             (when (> timeout 0)
               (thread-sleep! (/ timeout 1000))
               (loop))))
-        ((session-storage-delete!) (session-table) sid))))
+        ((session-storage-delete!) sid))))
     sid))
 
 (define (session-refresh! sid)
@@ -101,7 +105,7 @@
 (define (session-destroy! sid)
   (let ((finalizer (session-item-finalizer (get-session-item sid))))
     (when finalizer (finalizer sid)))
-  ((session-storage-delete!) (session-table) sid))
+  ((session-storage-delete!) sid))
 
 (define session-id-generator
   (make-parameter
