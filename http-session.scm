@@ -4,8 +4,6 @@
          session-lifetime session-id-generator
          match-ip-address? session-destroy! session-del!
 
-         session-table make-session-table ;; DEPRECATED
-
          ;; session-item record
          make-session-item session-item-expiration session-item-ip
          session-item-bindings session-item-finalizer
@@ -75,10 +73,6 @@
       (unless storage
         (set! storage ((session-storage-initialize))))
       storage)))
-
-(define make-session-table make-session-storage) ;; DEPRECATED
-
-(define session-table session-storage) ;; DEPRECATED
 
 (define match-ip-address? (make-parameter #f))
 
