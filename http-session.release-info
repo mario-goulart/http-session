@@ -1,0 +1,16 @@
+;; -*- scheme -*-
+(repo git "git://github.com/mario-goulart/{egg-name}.git")
+(uri targz "https://github.com/mario-goulart/{egg-name}/tarball/{egg-release}")
+(uri files-list "http://code.call-cc.org/files-list?egg={egg-name};release={egg-release}" old-uri)
+
+(release "1.2.3" old-uri)
+(release "2.0" old-uri)
+(release "2.1" old-uri)
+(release "2.2" old-uri)
+(release "2.3" old-uri)
+(release "2.4" old-uri)
+(release "2.5" old-uri)
+(release "2.6" old-uri)
+(release "2.7" old-uri)
+
+(release "2.8")
