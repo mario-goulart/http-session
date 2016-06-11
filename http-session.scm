@@ -149,7 +149,8 @@
   (let ((sitem (get-session-item sid)))
     (session-item-bindings-set!
      sitem
-     (alist-delete! var (session-item-bindings sitem)))))
+     (alist-delete! var (session-item-bindings sitem)))
+    ((session-storage-set!) sid sitem)))
 
 (define (session-cleanup!)
   ((session-storage-cleanup!)))
