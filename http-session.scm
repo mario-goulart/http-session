@@ -14,10 +14,21 @@
          session-storage-delete! session-storage-cleanup!
          )
 
-(import scheme chicken data-structures utils extras)
-
-(use simple-sha1 posix intarweb spiffy uri-common srfi-1 srfi-18 srfi-69)
-
+(import scheme)
+(cond-expand
+  (chicken-4
+   (import chicken data-structures utils extras)
+   (use simple-sha1 posix intarweb spiffy uri-common srfi-1 srfi-18 srfi-69)
+   (define pseudo-random-integer random))
+  (chicken-5
+   (import (chicken base)
+           (chicken condition)
+           (chicken process-context posix)
+           (chicken random)
+           (chicken string)
+           (chicken time))
+   (import intarweb simple-sha1 spiffy srfi-1 srfi-18 srfi-69 uri-common))
+  (else (error "Unsupported CHICKEN version.")))
 
 ;; Configurable storage backend API
 (define session-storage-initialize
@@ -121,7 +132,7 @@
      (string->sha1sum
       (conc (current-milliseconds)
             (current-process-id)
-            (random (+ 1000 (current-process-id))))))))
+            (pseudo-random-integer (+ 1000 (current-process-id))))))))
 
 (define (unique-id)
   (let try-again ((id ((session-id-generator))))
