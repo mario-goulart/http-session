@@ -3,7 +3,7 @@
  (author "Mario Domenech Goulart")
  (license "BSD")
  (category web)
- (build-dependencies intarweb simple-sha1 spiffy srfi-1 srfi-18 srfi-69 uri-common)
+ (dependencies intarweb simple-sha1 spiffy srfi-1 srfi-18 srfi-69 uri-common)
  (component-options
   (csc-options "-O3" "-d1"))
  (components (extension http-session)))
