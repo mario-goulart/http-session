@@ -20,15 +20,17 @@
    (import chicken data-structures utils extras)
    (use simple-sha1 posix intarweb spiffy uri-common srfi-1 srfi-18 srfi-69)
    (define pseudo-random-integer random))
-  (chicken-5
+  ((or chicken-5 chicken-6)
    (import (chicken base)
            (chicken condition)
            (chicken process-context posix)
            (chicken random)
            (chicken string)
            (chicken time))
-   (import intarweb simple-sha1 spiffy srfi-1 srfi-18 srfi-69 uri-common))
+   (import intarweb simple-sha1 spiffy srfi-1 srfi-18 srfi-69 uri-common)
+   (cond-expand (chicken-6 (import (scheme base))) (else)))
   (else (error "Unsupported CHICKEN version.")))
+
 
 ;; Configurable storage backend API
 (define session-storage-initialize
