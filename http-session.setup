@@ -5,5 +5,5 @@
 
 (install-extension 'http-session
                    '("http-session.so" "http-session.import.so")
-                   '((version "2.10")))
+                   '((version "2.11")))
 
