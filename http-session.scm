@@ -28,7 +28,11 @@
            (chicken string)
            (chicken time))
    (import intarweb simple-sha1 spiffy srfi-1 srfi-18 srfi-69 uri-common)
-   (cond-expand (chicken-6 (import (scheme base))) (else)))
+   (cond-expand
+     (chicken-6
+       (import (scheme base))
+       (define current-milliseconds current-process-milliseconds))
+     (else)))
   (else (error "Unsupported CHICKEN version.")))
 
 
