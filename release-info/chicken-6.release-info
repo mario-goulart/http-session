@@ -3,3 +3,4 @@
 (uri targz "https://github.com/mario-goulart/{egg-name}/tarball/{egg-release}")
 
 (release "2.11")
+(release "2.12")
